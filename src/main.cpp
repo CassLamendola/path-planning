@@ -160,6 +160,42 @@ vector<double> getXY(double s, double d, vector<double> maps_s, vector<double> m
 
 }
 
+bool check_lane(int lane_n, vector<vector<double>> s_fusion, int path_size, double s, bool current_lane)
+{
+  bool danger = false;
+  for(int i = 0; i < s_fusion.size(); i++)
+  {
+    float d = s_fusion[i][6];
+    if(d < (2+4*lane_n+2) && d > (2+4*lane_n-2))
+    {
+      double vx = s_fusion[i][3];
+      double vy = s_fusion[i][4];
+      double check_speed = sqrt(pow(vx,2)+pow(vy,2));
+      double check_car_s = s_fusion[i][5];
+
+      check_car_s += ((double)path_size*0.02*check_speed);
+      
+      if(current_lane)
+      {
+        if((check_car_s > s) && ((check_car_s - s) < 30))
+        {
+          danger = true;
+          cout << "car in current lane " << d << " " << check_car_s - s << " meters away" << endl;
+        }
+      }
+      else
+      {
+        if(abs(check_car_s - s) < 15)
+        {
+          danger = true;
+          cout << "car in lane " << d << " " << check_car_s - s << " meters away" << endl;
+        }
+      }
+    }
+  }
+  return danger;
+}
+
 int main() {
   uWS::Hub h;
 
@@ -249,38 +285,41 @@ int main() {
               car_s = end_path_s;
             }
 
-            bool too_close = false;
-
-            //find ref_v to use
-            for(int i = 0; i < sensor_fusion.size(); i++)
-            {
-              //car is in my lane
-              float d = sensor_fusion[i][6];
-              if(d < (2+4*lane+1.9) && d > (2+4*lane-1.9))
-              {
-                double vx = sensor_fusion[i][3];
-                double vy = sensor_fusion[i][4];
-                double check_speed = sqrt(pow(vx,2)+pow(vy,2));
-                double check_car_s = sensor_fusion[i][5];
-
-                check_car_s += ((double)prev_size*0.02*check_speed);
-
-                // check if the car is going to be within 30m of my car
-                if((check_car_s > car_s) && ((check_car_s - car_s) < 30))
-                {
-                  too_close = true;
-                  if(lane > 0)
-                  {
-                    lane = 0;
-                  }
-                }
-              }
-            }
+            bool too_close = check_lane(lane, sensor_fusion, prev_size, car_s, true);
 
             if(too_close)
             {
-              ref_vel -= .224;
+              if(lane == 1)
+              {
+                if(check_lane(0, sensor_fusion, prev_size, car_s, false) == false)
+                {
+                  lane = 0;
+                  cout << "changing to lane 0" << endl;
+                }
+                else if (check_lane(2, sensor_fusion, prev_size, car_s, false) == false)
+                {
+                  lane = 2;
+                  cout << "changing to lane 2" << endl;
+                }
+                else
+                {
+                  ref_vel -= .224;
+                }
+              }
+              else
+              {
+                if(check_lane(1, sensor_fusion, prev_size, car_s, false) == false)
+                {
+                  lane = 1;
+                  cout << "changing to lane 1" << endl;
+                }
+                else
+                {
+                  ref_vel -= .18;
+                }
+              } 
             }
+
             else if(ref_vel < 49.5)
             {
               ref_vel += .358;
