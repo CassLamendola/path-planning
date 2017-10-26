@@ -1,8 +1,5 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
-   
-### Simulator.
-You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases).
 
 ### Goals
 In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 50 m/s^3.
@@ -87,50 +84,25 @@ A really helpful resource for doing this project and creating smooth trajectorie
     git checkout e94b6e1
     ```
 
-## Editor Settings
+## Reflection
+_________________
+As a starting point, I followed [this](https://www.youtube.com/watch?v=3QP3hJHm4WM&feature=youtu.be) walkthrough of the project. The solution first converts coordinates from their current orientation to the car's orientation. Then reference points are created and a spline function generates a smooth set of waypoints for the car to follow.
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+To get the car to change lanes and alter the path, I implemented a function to check a specific lane to see if it is "clear". When checking the lane the vehicle is currently in, "clear" means more than 30 meters of space ahead. When checking an adjacent lane (which only happens when planning a lane change), "clear" means more than 15 meters ahead of and behind the car so as not to "cut off" another vehicle and cause a collision.
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+By default, the vehicle stays in the same lane and only checks other lanes if it comes within 30 meters of another car in the lane. Then, the vehicle always checks the left lane first. If the left lane is not clear, it will check the right lane. If both lanes are not clear, the car will slow down and keep checking for availability in the other lanes.
 
-## Code Style
+### Ideas for improvement
+* Use cost functions to make decisions about lane changes
+* Match speed of other cars instead of intermittently speeding up and slowing down when following
+* Accelerate at a higher rate when starting at 0 mph and decelerate at a higher rate when too close to another vehicle
+* Choose lane to change to based on the speed of other vehicles
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
-
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+![screenshot](./images/Screen\ Shot\ 2017-09-14\ at\ 1.56.44\ PM)
 
 
-## Call for IDE Profiles Pull Requests
 
-Help your fellow students!
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
+### 
