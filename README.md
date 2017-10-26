@@ -99,7 +99,7 @@ By default, the vehicle stays in the same lane and only checks other lanes if it
 * Choose lane to change to based on the speed of other vehicles
 
 [//]: # (Image References)
-[image1]: ./screenshot.png "screenshot"
+[image1]: ./screenshot.jpg "screenshot"
 ![alt text][image1]
 
 
